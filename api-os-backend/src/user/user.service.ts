@@ -8,27 +8,10 @@ import * as bcrypt from 'bcrypt'
 export class UserService {
     @Inject()
     private readonly Prisma: PrismaService
-    async getUserAccessLevel(id: number): Promise<string> {
-      const user = await this.Prisma.user.findUnique({
-        where: { id },
-        select: { acess_level: true }, // Seleciona apenas o campo access_level
-      });
-  
-      if (!user) {
-        throw new NotFoundException('User not found');
-      }
-  
-      // Retorne "master" se o access_level do usuário for "master"
-      if (user.acess_level === 'master') {
-        return 'master';
-      }
-  
-      // Retorne outra string ou lance uma exceção se não for "master"
-      return 'not master'; // Você pode ajustar esta parte conforme necessário
-    }
+    
   
      async User(UserWhereUniqueInput:Prisma.UserWhereUniqueInput):Promise<Omit< User,'pasword'>>{
-        return this.Prisma.user.findUnique({where:UserWhereUniqueInput, select:{id:true,name:true,pasword:false,acess_level:true,createdAt:true,updatedAt:true}})
+        return this.Prisma.user.findUnique({where:UserWhereUniqueInput, select:{id:true,name:true,pasword:false,createdAt:true,updatedAt:true}})
      }
      async createUser (data: Prisma.UserCreateInput){
         const hashPassword = await bcrypt.hash(data.pasword,10)

@@ -17,8 +17,13 @@ model User{
   id Int @default(autoincrement()) @id
   name String
   pasword String
-  acess_level String  @default("basic")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
 }
+ model Admin{
+  id Int @default(autoincrement()) @id
+  name String
+  pasword String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+ }

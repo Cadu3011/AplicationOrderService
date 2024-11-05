@@ -7,6 +7,4 @@ export class CreateUsersDto {
     @IsAlphanumeric()
     @IsNotEmpty()
     pasword: string;
-    @IsString()
-    acess_level:string
 }
