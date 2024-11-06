@@ -18,6 +18,10 @@ enum Role {
   OPERATOR
   GUEST
 }
+enum Status {
+  PENDENTE
+  CONFIRMED
+}
 model User{
   id Int @default(autoincrement()) @id
   name String
@@ -25,11 +29,25 @@ model User{
   roles Role   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  ordensServico OrdemServico[]
 }
- model Admin{
-  id Int @default(autoincrement()) @id
-  name String
-  pasword String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
- }
+model OrdemServico{
+  id         Int      @default(autoincrement()) @id 
+  description String
+  status     Status
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  userId     Int
+
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+model Products{
+  id         Int      @default(autoincrement()) @id 
+  description String
+  price Int
+}
+model Stock{
+  id         Int      @default(autoincrement()) @id
+}
+

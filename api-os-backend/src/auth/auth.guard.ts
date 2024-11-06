@@ -31,7 +31,7 @@ export class AuthGuard implements CanActivate {
     request['sub'] = payload; // Adiciona o payload à requisição
 
     const userRole: Role = payload.roles || []; // Assumindo que o payload tem o campo `role`
-    console.log(userRole)
+    
     // Verifica se o usuário tem um dos papéis requeridos
     const hasRole = requiredRoles.includes(userRole);
 
