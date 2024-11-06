@@ -11,7 +11,7 @@ export class UserService {
     
   
      async User(UserWhereUniqueInput:Prisma.UserWhereUniqueInput):Promise<Omit< User,'pasword'>>{
-        return this.Prisma.user.findUnique({where:UserWhereUniqueInput, select:{id:true,name:true,pasword:false,createdAt:true,updatedAt:true}})
+        return this.Prisma.user.findUnique({where:UserWhereUniqueInput, select:{id:true,name:true,pasword:false,roles:true,createdAt:true,updatedAt:true}})
      }
      async createUser (data: Prisma.UserCreateInput){
         const hashPassword = await bcrypt.hash(data.pasword,10)

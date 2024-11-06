@@ -1,3 +1,4 @@
+import { Role } from "@prisma/client";
 import { IsAlphanumeric, IsNotEmpty, IsString } from "class-validator";
 
 export class CreateUsersDto {
@@ -7,4 +8,7 @@ export class CreateUsersDto {
     @IsAlphanumeric()
     @IsNotEmpty()
     pasword: string;
+    @IsString()
+    @IsNotEmpty()
+    roles: Role 
 }

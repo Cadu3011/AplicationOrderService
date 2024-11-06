@@ -1,8 +1,8 @@
-import { User } from "@prisma/client";
+import { Role, User } from "@prisma/client";
 export class Users implements User{
     name: string;
     id: number;
-    acess_level: string;
+    roles: Role;
     pasword: string;
     createdAt: Date;
     updatedAt: Date;

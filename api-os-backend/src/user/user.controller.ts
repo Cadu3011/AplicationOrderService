@@ -1,18 +1,19 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Patch, Post, Res, UseGuards ,ValidationPipe,NotFoundException, Req} from '@nestjs/common';
 import { UserService } from './user.service';
-import {Prisma ,User as UserModel}from '@prisma/client'
+import {Prisma ,Role,User as UserModel}from '@prisma/client'
 import { AuthGuard } from 'src/auth/auth.guard';
 import { CreateUsersDto } from './dto/createUser.dto';
 import { UpdateUsersDto } from './dto/updateUser.dto';
+import { Roles } from 'src/auth/roles.decorator';
 @Controller('user')
 export class UserController {
     constructor(private userService:UserService){}
-    @UseGuards(AuthGuard)
+    
     @Post()
     async signupUser(@Body(new ValidationPipe())  createUsersDto: CreateUsersDto):Promise<UserModel>{
         return this.userService.createUser(createUsersDto)
     }
- 
+    @Roles(Role.ADMIN)
     @UseGuards(AuthGuard)
     @Get(':id')
     async getUser(@Param('id' ,new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) id:number ,@Req() request: Request):Promise<Omit< UserModel , 'pasword'> |Object>{
