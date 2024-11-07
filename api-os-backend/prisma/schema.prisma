@@ -29,25 +29,48 @@ model User{
   roles Role   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  ordensServico OrdemServico[]
+  ordensServico ServiceOrder []
+  stockMovement StockMovement[]
 }
-model OrdemServico{
+model ServiceOrder {
   id         Int      @default(autoincrement()) @id 
   description String
   status     Status
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  products    OrderProduct[]
   userId     Int
 
   user       User     @relation(fields: [userId], references: [id])
 }
 
-model Products{
-  id         Int      @default(autoincrement()) @id 
-  description String
-  price Int
+model Product {
+  id          Int    @id @default(autoincrement())
+  name        String
+  price       Decimal @db.Decimal(9,2)    // Armazene em centavos para precisão
+  quantity    Int    // Quantidade atual em estoque
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  movements   StockMovement[]
+ orders      OrderProduct[]
 }
-model Stock{
-  id         Int      @default(autoincrement()) @id
+model OrderProduct {
+  id          Int            @id @default(autoincrement())
+  serviceOrderId Int
+  productId   Int
+  quantity    Int            // Quantidade do produto utilizada na ordem
+
+  serviceOrder ServiceOrder  @relation(fields: [serviceOrderId], references: [id])
+  product     Product        @relation(fields: [productId], references: [id])
+}
+model StockMovement {
+  id          Int    @id @default(autoincrement())
+  productId   Int
+  quantity    Int      // Quantidade movimentada (positiva para entrada, negativa para saída)
+  type        String   // "IN" para entrada e "OUT" para saída
+  createdAt   DateTime @default(now())
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+  product     Product  @relation(fields: [productId], references: [id])
 }
 
