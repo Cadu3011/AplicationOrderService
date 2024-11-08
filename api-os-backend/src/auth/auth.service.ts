@@ -12,8 +12,8 @@ export class AuthService {
     @Inject() 
     private readonly jtwService:JwtService
   
-    async signin(params:Prisma.UserCreateManyInput):Promise<{access_token:String}>{ 
-        const user = await this.prisma.user.findFirstOrThrow({where:{name:params.name ,id:params.id,roles:params.roles}})
+    async signin(params:Prisma.UserCreateInput):Promise<{access_token:String}>{ 
+        const user = await this.prisma.user.findFirst({where:{name:params.name}})
         if(!user)throw new NotFoundException("user not found")
         const passwordMatch = await bcrypt.compare(params.pasword, user.pasword)
         if(!passwordMatch) throw new UnauthorizedException("Invalid credentials")

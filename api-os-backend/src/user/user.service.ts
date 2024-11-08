@@ -27,6 +27,9 @@ export class UserService {
         return this.Prisma.user.create({data:{...data, pasword: hashPassword}})
      }
      async updateUser(params:{ where: Prisma.UserWhereUniqueInput; data: Prisma.UserUpdateInput}):Promise<User>{
+         if (params.data.pasword) {
+            params.data.pasword = await bcrypt.hash(params.data.pasword.toString(), 10);
+         }
         const{where, data} = params 
         return this.Prisma.user.update({data , where})
      }

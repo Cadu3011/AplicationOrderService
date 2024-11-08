@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -18,59 +12,69 @@ enum Role {
   OPERATOR
   GUEST
 }
+
 enum Status {
   PENDENTE
   CONFIRMED
 }
-model User{
-  id Int @default(autoincrement()) @id
-  name String
-  pasword String
-  roles Role   
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  ordensServico ServiceOrder []
-  stockMovement StockMovement[]
-}
-model ServiceOrder {
-  id         Int      @default(autoincrement()) @id 
-  description String
-  status     Status
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  products    OrderProduct[]
-  userId     Int
 
-  user       User     @relation(fields: [userId], references: [id])
+model User {
+  id           Int               @id @default(autoincrement())
+  name         String 
+  pasword      String
+  roles        Role
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  ordensServico OperadorOrdemServico[] // Relacionamento com tabela pivot OperadorOrdemServico
+}
+
+model ServiceOrder {
+  id            Int               @id @default(autoincrement())
+  description   String
+  status        Status
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  products      ProdutoOrdemServico[] // Relacionamento com tabela pivot ProdutoOrdemServico
+  operadores    OperadorOrdemServico[] // Relacionamento com tabela pivot OperadorOrdemServico
 }
 
 model Product {
-  id          Int    @id @default(autoincrement())
-  name        String
-  price       Decimal @db.Decimal(9,2)    // Armazene em centavos para precisão
-  quantity    Int    // Quantidade atual em estoque
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  movements   StockMovement[]
- orders      OrderProduct[]
-}
-model OrderProduct {
-  id          Int            @id @default(autoincrement())
-  serviceOrderId Int
-  productId   Int
-  quantity    Int            // Quantidade do produto utilizada na ordem
-
-  serviceOrder ServiceOrder  @relation(fields: [serviceOrderId], references: [id])
-  product     Product        @relation(fields: [productId], references: [id])
-}
-model StockMovement {
-  id          Int    @id @default(autoincrement())
-  productId   Int
-  quantity    Int      // Quantidade movimentada (positiva para entrada, negativa para saída)
-  type        String   // "IN" para entrada e "OUT" para saída
-  createdAt   DateTime @default(now())
-  userId     Int
-  user       User     @relation(fields: [userId], references: [id])
-  product     Product  @relation(fields: [productId], references: [id])
+  id             Int               @id @default(autoincrement())
+  name           String
+  price          Decimal           @db.Decimal(9,2)
+  quantity       Int               // Quantidade atual em estoque
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  estoque     Estoque? @relation("ProdutoEstoque")         // Apenas especificando a relação sem os atributos
+  ordensServico  ProdutoOrdemServico[] // Relacionamento com tabela pivot ProdutoOrdemServico
 }
 
+model Estoque {
+  id             Int               @id @default(autoincrement())
+  quantidade     Int
+  produtoId      Int               @unique
+   produto     Product  @relation("ProdutoEstoque", fields: [produtoId], references: [id])
+}
+
+model OperadorOrdemServico {
+  userId        Int
+  ordemServicoId Int
+
+  operador      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ordemServico  ServiceOrder      @relation(fields: [ordemServicoId], references: [id], onDelete: Cascade)
+
+  @@id([userId, ordemServicoId])  // Chave primária composta
+  @@map("operador_ordem_servico") // Nome da tabela no banco de dados (opcional)
+}
+
+model ProdutoOrdemServico {
+  produtoId     Int
+  ordemServicoId Int
+  quantidade    Int               // Quantidade de produto utilizada na ordem de serviço
+
+  produto       Product           @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  ordemServico  ServiceOrder      @relation(fields: [ordemServicoId], references: [id], onDelete: Cascade)
+
+  @@id([produtoId, ordemServicoId]) // Chave primária composta
+  @@map("produto_ordem_servico")    // Nome da tabela no banco de dados (opcional)
+}
