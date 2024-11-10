@@ -16,6 +16,7 @@ enum Role {
 enum Status {
   PENDENTE
   CONFIRMED
+  CANCELED
 }
 
 model User {
@@ -24,8 +25,8 @@ model User {
   pasword      String
   roles        Role
   createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-  ordensServico OperadorOrdemServico[] // Relacionamento com tabela pivot OperadorOrdemServico
+  updatedAt    DateTime          @updatedAt 
+  ServiceOrder ServiceOrder[] @relation("operatorOrdemSerice")
 }
 
 model ServiceOrder {
@@ -34,47 +35,32 @@ model ServiceOrder {
   status        Status
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
-  products      ProdutoOrdemServico[] // Relacionamento com tabela pivot ProdutoOrdemServico
-  operadores    OperadorOrdemServico[] // Relacionamento com tabela pivot OperadorOrdemServico
+  estoques       Estoque[]    @relation("ordemServiceStock")// Relacionamento com tabela pivot ProdutoOrdemServico
+  operadores    User[] @relation("operatorOrdemSerice")// Relacionamento com tabela pivot OperadorOrdemServico
 }
 
 model Product {
   id             Int               @id @default(autoincrement())
   name           String
   price          Decimal           @db.Decimal(9,2)
-  quantity       Int               // Quantidade atual em estoque
+  quantity       Int  
+  isActive Boolean @default(true)
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
-  estoque     Estoque? @relation("ProdutoEstoque")         // Apenas especificando a relação sem os atributos
-  ordensServico  ProdutoOrdemServico[] // Relacionamento com tabela pivot ProdutoOrdemServico
+  estoques       Estoque[]    @relation("ProdutoEstoque")       // Apenas especificando a relação sem os atributos
+   // Relacionamento com tabela pivot ProdutoOrdemServico
 }
 
 model Estoque {
   id             Int               @id @default(autoincrement())
   quantidade     Int
-  produtoId      Int               @unique
-   produto     Product  @relation("ProdutoEstoque", fields: [produtoId], references: [id])
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  produtoId      Int   
+  ordemId Int?            
+  produto        Product            @relation("ProdutoEstoque", fields: [produtoId], references: [id])
+  ordensServico  ServiceOrder?     @relation("ordemServiceStock", fields: [ordemId], references: [id])
 }
 
-model OperadorOrdemServico {
-  userId        Int
-  ordemServicoId Int
 
-  operador      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  ordemServico  ServiceOrder      @relation(fields: [ordemServicoId], references: [id], onDelete: Cascade)
 
-  @@id([userId, ordemServicoId])  // Chave primária composta
-  @@map("operador_ordem_servico") // Nome da tabela no banco de dados (opcional)
-}
-
-model ProdutoOrdemServico {
-  produtoId     Int
-  ordemServicoId Int
-  quantidade    Int               // Quantidade de produto utilizada na ordem de serviço
-
-  produto       Product           @relation(fields: [produtoId], references: [id], onDelete: Cascade)
-  ordemServico  ServiceOrder      @relation(fields: [ordemServicoId], references: [id], onDelete: Cascade)
-
-  @@id([produtoId, ordemServicoId]) // Chave primária composta
-  @@map("produto_ordem_servico")    // Nome da tabela no banco de dados (opcional)
-}

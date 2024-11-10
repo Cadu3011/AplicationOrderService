@@ -2,14 +2,21 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { OrdemServicoService } from './ordem-servico.service';
 import { CreateOrdemServicoDto } from './dto/create-ordem-servico.dto';
 import { UpdateOrdemServicoDto } from './dto/update-ordem-servico.dto';
+import { PrismaService } from 'src/database/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Controller('ordem-servico')
 export class OrdemServicoController {
   constructor(private readonly ordemServicoService: OrdemServicoService) {}
-
   @Post()
-  create(@Body() createOrdemServicoDto: CreateOrdemServicoDto) {
-    return this.ordemServicoService.create(createOrdemServicoDto);
+  async create(@Body() createOrdemServicoDto: CreateOrdemServicoDto,product:Prisma.EstoqueCreateInput) {
+    
+    return this.ordemServicoService.create(createOrdemServicoDto,product)
+  }
+  @Post(':OSId/produtos/:produtoId')
+  async addProdutcOS(@Param('OSId') ordemServiceId:number ,@Param('produtoId') produtoId:number , @Body('quantidade') quantidade:number) {
+    
+    return this.ordemServicoService.addProdutoOS(+ordemServiceId,+produtoId,+quantidade)
   }
 
   @Get()

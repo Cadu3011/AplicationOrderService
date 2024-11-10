@@ -19,9 +19,8 @@ export class UserController {
     async getUser(@Param('id' ,new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) id:number ,@Req() request: Request):Promise<Omit< UserModel , 'pasword'> |Object>{
         return this.userService.User({id})
     }
-    
+    @Roles(Role.ADMIN)
     @UseGuards(AuthGuard)
-    
     @Get()
     async getAllUsers(){
         return this.userService.findAllUsers()

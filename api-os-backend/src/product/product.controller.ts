@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete , ParseIntPipe, HttpStatus,ValidationPipe, Req} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param , ParseIntPipe, HttpStatus,ValidationPipe, Req, Query} from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -17,25 +17,40 @@ export class ProductController {
   ) {
     return this.productService.addStockToProduct(productId, body.quantity);
   }
-
-
+ 
   @Get()
   findAll() {
     return this.productService.findAll();
+  }
+  @Get('stock/:produtoId')
+  findAllInStock(@Param('produtoId' ,new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) produtoId:number ,) {
+    return this.productService.findAllInStock(produtoId)
   }
 
   @Get(':id')
   findOne(@Param('id' ,new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) id:number ,@Req() request: Request) {
     return this.productService.findOne({id});
   }
+  @Get('/nome/:nome')
+   async findByName( @Param('nome') nome: string) {
+    try {
+      const product = await this.productService.findAllProductOS(nome);
+      if (!product) {
+        // Handle case where product might not be found
+        return {
+          message: 'Product not found',
+          data: [], // Return empty array if product not found
+        };
+      }
+      return  product // Wrap the retrieved product in an array
+      ;
+    } catch (error) {
+      throw('An error occurred');
+    }
+  }
 
   @Patch(':id')
   update(@Body(new ValidationPipe()) productData: UpdateProductDto, @Param('id' ,new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) id:number) {
     return this.productService.update({where: {id},data:productData});
-  }
-
-  @Delete(':id')
-  remove(@Param('id',new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) id:number) {
-    return this.productService.remove({id});
   }
 }

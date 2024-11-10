@@ -36,5 +36,6 @@ export class UserService {
      async deleteUser(where:Prisma.UserWhereUniqueInput):Promise<User>{
             return this.Prisma.user.delete({where})
      }
+     
     
 }
