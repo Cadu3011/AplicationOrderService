@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, ParseIntPipe } from '@nestjs/common';
 import { OrdemServicoService } from './ordem-servico.service';
 import { CreateOrdemServicoDto } from './dto/create-ordem-servico.dto';
 import { UpdateOrdemServicoDto } from './dto/update-ordem-servico.dto';
@@ -30,12 +30,8 @@ export class OrdemServicoController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrdemServicoDto: UpdateOrdemServicoDto) {
-    return this.ordemServicoService.update(+id, updateOrdemServicoDto);
+  update(@Param('id' ,new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) id:number, @Body() updateOrdemServicoDto: Prisma.ServiceOrderCreateManyArgs) {
+    return this.ordemServicoService.update({where:{id},data:updateOrdemServicoDto});
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ordemServicoService.remove(+id);
-  }
 }

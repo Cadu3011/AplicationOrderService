@@ -64,11 +64,15 @@ export class OrdemServicoService {
     return `This action returns a #${id} ordemServico`;
   }
 
-  update(id: number, updateOrdemServicoDto: UpdateOrdemServicoDto) {
-    return `This action updates a #${id} ordemServico`;
+  async update(params:{where: Prisma.ServiceOrderWhereUniqueInput, data: Prisma.ServiceOrderCreateManyArgs}) {
+    const{where, data} = params
+    const ordemService = this.findOne(where.id)
+
+    if (!ordemService) {
+      throw new Error('ordem de serviço não encontrada');
+    }
+    return this.Prisma.serviceOrder.update({where,data})
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} ordemServico`;
-  }
+  
 }
