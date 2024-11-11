@@ -61,7 +61,7 @@ export class OrdemServicoService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} ordemServico`;
+    return this.Prisma.serviceOrder.findUnique({where:{id}})
   }
 
   async update(params:{where: Prisma.ServiceOrderWhereUniqueInput, data: Prisma.ServiceOrderCreateManyArgs}) {

@@ -18,7 +18,7 @@ const Signin = () => {
     };
 
     try {
-      const response = await fetch('https://2bbc-177-67-172-52.ngrok-free.app/auth/signin', {
+      const response = await fetch('http://localhost:4000/auth/signin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

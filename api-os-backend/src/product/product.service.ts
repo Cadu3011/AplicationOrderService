@@ -16,7 +16,7 @@ export class ProductService {
       data: {
         name: data.name,
         price: data.price,
-        quantity: data.quantity, // A quantidade do produto na tabela Product
+        quantity: Number(data.quantity), // A quantidade do produto na tabela Product
         estoques: {
           create: 
              estoqueData  // Quantidade do estoque

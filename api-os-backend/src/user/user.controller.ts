@@ -13,26 +13,23 @@ export class UserController {
     async signupUser(@Body(new ValidationPipe())  createUsersDto: CreateUsersDto):Promise<UserModel>{
         return this.userService.createUser(createUsersDto)
     }
-    @UseGuards(AuthGuard)
-    @Roles(Role.ADMIN)
     @Get(':id')
     async getUser(@Param('id' ,new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) id:number ,@Req() request: Request):Promise<Omit< UserModel , 'pasword'> |Object>{
         return this.userService.User({id})
     }
-    @Roles(Role.ADMIN)
-    @UseGuards(AuthGuard)
+    
     @Get()
     async getAllUsers(){
         return this.userService.findAllUsers()
     }
-    @UseGuards(AuthGuard)
-    @Roles(Role.ADMIN)
+   
     @Patch(':id')
     async updateUser(@Body(new ValidationPipe()) userData: UpdateUsersDto, @Param('id' ,new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) id:number):Promise<UserModel>{
         return this.userService.updateUser({where: {id},data: userData})
     }
-    @UseGuards(AuthGuard)
     
+    @UseGuards(AuthGuard)
+    @Roles(Role.ADMIN)
     @Delete(':id')
     async deleteUser(@Param('id',new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) id:number):Promise<UserModel>{
             return this.userService.deleteUser({id})
