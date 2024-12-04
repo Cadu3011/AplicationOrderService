@@ -22,6 +22,9 @@ export class UserService {
         },
       });
     }
+    async filterUserByName(nome:string){
+      return this.Prisma.user.findMany({where:{name:{contains:nome}}})
+    }
      async createUser (data: Prisma.UserCreateInput){
         const hashPassword = await bcrypt.hash(data.pasword,10)
         return this.Prisma.user.create({data:{...data, pasword: hashPassword}})

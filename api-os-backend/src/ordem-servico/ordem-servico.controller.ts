@@ -28,10 +28,17 @@ export class OrdemServicoController {
   findOne(@Param('id') id: string) {
     return this.ordemServicoService.findOne(+id);
   }
-
-  @Patch(':id')
-  update(@Param('id' ,new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) id:number, @Body() updateOrdemServicoDto: Prisma.ServiceOrderCreateManyArgs) {
-    return this.ordemServicoService.update({where:{id},data:updateOrdemServicoDto});
+  @Get(':nome')
+  filterOrderByname(@Param('nome') nome: string){
+    return this.ordemServicoService.filterOrderByname(nome)
   }
+  @Patch(':id')
+  update(
+    @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number,
+    @Body() updateOrdemServicoDto: Prisma.ServiceOrderUpdateInput // Alterado de ServiceOrderCreateManyArgs para ServiceOrderUpdateInput
+  ) {
+    return this.ordemServicoService.update({ where: { id }, data: updateOrdemServicoDto });
+  }
+  
 
 }

@@ -7,54 +7,57 @@ import { PrismaService } from 'src/database/prisma.service';
 @Injectable()
 export class OrdemServicoService {
   constructor(private readonly Prisma: PrismaService) {}
-  async create(data: Prisma.ServiceOrderCreateInput,produto?:Prisma.EstoqueCreateInput) {
-    
+  async create(data: Prisma.ServiceOrderCreateInput, produto?: Prisma.EstoqueCreateInput) {
     const serviceOrder = await this.Prisma.serviceOrder.create({
-      data:{
+      data: {
         ...data,
-      estoques: {
-        create: 
-           produto  // Quantidade do estoque 
-      },
-    }
-    })
-    return serviceOrder
-  }
-  async addProdutoOS(ordemServicoId:number,productId: number, quantity: number): Promise<void> {
-    // Obter o produto e seu estoque
-    const product = await this.Prisma.product.findUnique({
-      where: { id: productId ,isActive:true},
-       // Incluindo a relação de estoque
+        estoques: produto ? { create: [produto] } : undefined // Criando estoque se produto for fornecido
+      }
     });
+    return serviceOrder;
+  }
+  
+  async addProdutoOS(ordemServicoId: number, productId: number, quantity: number): Promise<void> {
+    // Obter o produto
+    const product = await this.Prisma.product.findUnique({
+      where: { id: productId, isActive: true },
+    });
+    
     const ordemService = await this.Prisma.serviceOrder.findUnique({
-      where:{id:ordemServicoId}
-    })
-
+      where: { id: ordemServicoId },
+      include: { estoques: true } // Inclui os produtos já associados à ordem
+    });
+  
     if (!product) {
       throw new Error('Produto não encontrado');
     }
-
+  
+    if (!ordemService) {
+      throw new Error('Ordem de serviço não encontrada');
+    }
+  
     // Atualizar a quantidade do produto no estoque
     await this.Prisma.product.update({
       where: { id: productId },
       data: {
-        quantity: product.quantity - quantity, // Somar a quantidade ao estoque do produto
+        quantity: product.quantity - quantity, // Atualiza a quantidade do estoque do produto
       },
     });
-    // Atualizar o estoque (se necessário)
+  
+    // Adicionar o produto à ordem de serviço
     await this.Prisma.estoque.create({
-      data:{
-        quantidade:quantity,
-        produto:{
-          connect:{id:productId}
+      data: {
+        quantidade: quantity,
+        produto: {
+          connect: { id: productId }
         },
-        ordensServico:{
-          connect:{id:ordemServicoId}
-        }
-
+        ordensServico: {
+          connect: { id: ordemServicoId }
+        },
       }
-    })
+    });
   }
+  
 
   findAll() {
     return this.Prisma.serviceOrder.findMany({include:{operadores:true,estoques:{include:{produto:true}}}})
@@ -63,16 +66,38 @@ export class OrdemServicoService {
   findOne(id: number) {
     return this.Prisma.serviceOrder.findUnique({where:{id}})
   }
-
-  async update(params:{where: Prisma.ServiceOrderWhereUniqueInput, data: Prisma.ServiceOrderCreateManyArgs}) {
-    const{where, data} = params
-    const ordemService = this.findOne(where.id)
-
-    if (!ordemService) {
-      throw new Error('ordem de serviço não encontrada');
-    }
-    return this.Prisma.serviceOrder.update({where,data})
+  filterOrderByname(nome:string){
+    return this.Prisma.serviceOrder.findMany({where:{description:{contains:nome}}})
   }
+  async update(params: { where: Prisma.ServiceOrderWhereUniqueInput, data: Prisma.ServiceOrderUpdateInput }) {
+    const { where, data } = params;
+    
+    // Verificando se a ordem de serviço existe
+    const ordemService = await this.Prisma.serviceOrder.findUnique({ where });
+  
+    if (!ordemService) {
+      throw new Error('Ordem de serviço não encontrada');
+    }
+  
+    // Verificando se operadores ou produtos precisam ser conectados
+    const operadoresAtualizados = data.operadores ? {
+      connect: data.operadores.connect || []
+    } : undefined;
+  
+    const estoquesAtualizados = data.estoques ? {
+      connect: data.estoques.connect || []
+    } : undefined;
+  
+    return this.Prisma.serviceOrder.update({
+      where,
+      data: {
+        ...data,
+        operadores: operadoresAtualizados,
+        estoques: estoquesAtualizados
+      }
+    });
+  }
+  
 
   
 }

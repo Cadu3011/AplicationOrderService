@@ -22,6 +22,10 @@ export class UserController {
     async getAllUsers(){
         return this.userService.findAllUsers()
     }
+    @Get(':nome')
+    async filterUser(@Param('nome') nome: string){
+        return this.userService.filterUserByName(nome)
+    }
    
     @Patch(':id')
     async updateUser(@Body(new ValidationPipe()) userData: UpdateUsersDto, @Param('id' ,new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) id:number):Promise<UserModel>{

@@ -56,21 +56,16 @@ const App = () => {
     }
   };
 
-  const addProductToOrder = async (orderId, productId) => {
-     const { id: ordemId } = editOrdem;
+  const addProductToOrder = async () => {
+    const { id: ordemId } = editOrdem;
     if (selectedProduct && quantity > 0) {
       try {
-        // Usando os IDs da ordem de serviço e do produto dinamicamente
-        await axios.post(`http://localhost:4000/ordem-servico/${ordemId}/produtos/${selectedProduct.id}`, { quantidade: quantity }, {
-          headers: {
-            'Content-Type': 'application/json',  // Especifica que o conteúdo é JSON
-          }}
-      );
-        setIsProductModalOpen(false); // Fecha o modal de adicionar produto
-        setProductSearch(""); // Limpa a busca
-        setSelectedProduct(null); // Limpa o produto selecionado
-        setQuantity(1); // Reseta a quantidade
-        fetchOrdens(); // Atualiza as ordens de serviço
+        await axios.post(`http://localhost:4000/ordem-servico/${ordemId}/produtos/${selectedProduct.id}`, { quantidade: quantity });
+        setIsProductModalOpen(false);
+        setProductSearch("");
+        setSelectedProduct(null);
+        setQuantity(1);
+        fetchOrdens();
       } catch (error) {
         console.error("Erro ao adicionar produto:", error);
       }
@@ -78,6 +73,9 @@ const App = () => {
       console.log("Selecione um produto válido e insira uma quantidade.");
     }
   };
+  
+  
+  
   
 
   const openProductModal = () => {
@@ -109,28 +107,62 @@ const App = () => {
 
   const saveEdit = async () => {
     try {
-      const operadoresExistentes = editOrdem.operadores || [];  // Se não houver operadores, retorna um array vazio
-
-      // Cria o array de operadores com o operador atual (não duplicando)
+      const operadoresExistentes = editOrdem.operadores || [];
+      const produtosExistentes = editOrdem.estoques || []; // Produtos existentes (estoques)
+  
+      // Adiciona o operador atual sem duplicar
       const operadoresAtualizados = [
-        ...operadoresExistentes,  // Mantém os operadores atuais
-        { id: decoded.sub }  // Adiciona o operador atual
+        ...operadoresExistentes.map(op => ({ id: op.id })),  // Converte os operadores existentes para apenas ids
+      { id: decoded.sub } // Só envia o ID do operador
       ];
-      await axios.patch(`http://localhost:4000/ordem-servico/${editOrdem.id}`, {
+  
+      // Verifique se todos os produtos são válidos e possuem ID
+      const produtosAtualizados = produtosExistentes.filter(estoque => estoque.id).map(estoque => ({ id: estoque.id }));
+  
+      // Se não houver produtos válidos, evite enviar a chave estoques
+      const updateData = {
         status: editOrdem.status,
         description: editOrdem.description,
         operadores: {
-          connect: operadoresAtualizados  // Conecta todos os operadores (os existentes + o atual)
-        } // Certifique-se de salvar a descrição editada
-      });
+          connect: operadoresAtualizados, // Atualiza operadores (somente com ID)
+        },
+      };
+  
+      // Se houver produtos válidos, inclua no corpo da requisição
+      if (produtosAtualizados.length > 0) {
+        updateData.estoques = {
+          connect: produtosAtualizados, // Atualiza produtos
+        };
+      }
+  
+      console.log("Corpo da requisição enviado:", updateData); // Verifique o que está sendo enviado
+  
+      // Certifique-se de que o token JWT está sendo enviado corretamente
+      const access_token = localStorage.getItem('access_token');
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${access_token}`,
+          'Content-Type': 'application/json', // Adicionei o tipo de conteúdo como JSON
+        }
+      };
+  
+      // Envia a atualização para a API com o formato esperado
+      const edit = await axios.patch(`http://localhost:4000/ordem-servico/${editOrdem.id}`, updateData, config);
+  
+      console.log("Ordem de serviço editada:", edit);
       setIsEditing(false);
-      setIsCreating(false); // Fecha a tela de edição
-      fetchOrdens();
+      setIsCreating(false);
+      fetchOrdens(); // Atualiza a lista de ordens
     } catch (error) {
       console.error("Erro ao salvar edição:", error);
     }
   };
-
+  
+  
+  
+  
+  
+  
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setEditOrdem((prevState) => ({ ...prevState, [name]: value }));
@@ -147,14 +179,18 @@ const App = () => {
 
   const createOrdem = async () => {
     try {
-      await axios.post("http://localhost:4000/ordem-servico", newOrdem);
-      setIsCreating(false);
+      const response = await axios.post("http://localhost:4000/ordem-servico", newOrdem);
+      const novaOrdem = response.data; // Supondo que o backend retorna a ordem criada
       setNewOrdem({ description: "", status: "PENDENTE" });
-      fetchOrdens();
+      setEditOrdem(novaOrdem); // Define a nova ordem como a ordem em edição
+      setIsCreating(false);
+      setIsEditing(true); // Abre a tela de edição para adicionar produtos
+      fetchOrdens(); // Atualiza a lista de ordens
     } catch (error) {
       console.error("Erro ao criar ordem:", error);
     }
   };
+  
 
   return (
     <div className="container">
@@ -313,7 +349,10 @@ const App = () => {
                 Cancelar
               </button>
             </div>
-            <button onClick={openProductModal}>Adicionar Produto</button>
+            {isEditing && (
+  <button onClick={openProductModal}>Adicionar Produto</button>
+)}
+
           </div>
         </div>
       )}
