@@ -5,7 +5,11 @@ import Home from "../pages/home/Home"
 import HomeAdmin from "../pages/homeAdmin/HomeAdmin"
 import OrdemService from "../pages/ordemService/OrdemService"
 import AdminUser from "../pages/adminUser/AdminUser";
+import AdminOrderService from "../pages/adminOrderService/AdminOS"
 import AdminEstoque from "../pages/adminEstoque/adminProduct"
+import Layout from '../components/Layout';
+
+
 const Private = ({ Item }) => {
     const signed = false;
 
@@ -14,21 +18,26 @@ const Private = ({ Item }) => {
 
 const RoutesApp = () => {
     return (
-        <BrowserRouter>
-            <Fragment>
-                <Routes>
-          <Route path="/" element={<Signin />} />  {/* Página de login padrão */}
-          <Route path="/home" element={<Home />} />  {/* A rota para Home */}
-          <Route path="/admin-user" element={<AdminUser />} />
-          {/* <Route path="/admin-os" element={<AdminOS />} /> */}
-          <Route path="/admin-estoque" element={<AdminEstoque />} />
-          <Route path="/homeAdmin" element={<HomeAdmin />} />
-          <Route path="/ordemService" element={<OrdemService />} />
-                </Routes>
-            </Fragment>
-        </BrowserRouter>
+      <BrowserRouter>
+        <Fragment>
+          <Routes>
+            {/* Página de login que não terá o MenuBar */}
+            <Route path="/" element={<Signin />} />
+            <Route path="/ordemService" element={<OrdemService />} />
+            {/* As rotas abaixo serão renderizadas dentro do Layout, que contém o MenuBar */}
+            <Route element={<Layout />}>
+              <Route path="/home" element={<Home />} />
+              <Route path="/homeAdmin" element={<HomeAdmin />} />
+              <Route path="/admin-user" element={<AdminUser />} />
+              <Route path="/admin-os" element={<AdminOrderService />} />
+              <Route path="/admin-estoque" element={<AdminEstoque />} />
+              
+            </Route>
+          </Routes>
+        </Fragment>
+      </BrowserRouter>
     );
-}; 
+  };
 
 
 export default RoutesApp;

@@ -1,12 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateOrdemServicoDto } from './dto/create-ordem-servico.dto';
-import { UpdateOrdemServicoDto } from './dto/update-ordem-servico.dto';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma.service';
- 
 @Injectable()
 export class OrdemServicoService {
   constructor(private readonly Prisma: PrismaService) {}
+
   async create(data: Prisma.ServiceOrderCreateInput, produto?: Prisma.EstoqueCreateInput) {
     const serviceOrder = await this.Prisma.serviceOrder.create({
       data: {
@@ -16,7 +14,7 @@ export class OrdemServicoService {
     });
     return serviceOrder;
   }
-  
+
   async addProdutoOS(ordemServicoId: number, productId: number, quantity: number): Promise<void> {
     // Obter o produto
     const product = await this.Prisma.product.findUnique({
@@ -57,12 +55,12 @@ export class OrdemServicoService {
       }
     });
   }
-  
-
   findAll() {
-    return this.Prisma.serviceOrder.findMany({include:{operadores:true,estoques:{include:{produto:true}}}})
+    return this.Prisma.serviceOrder.findMany({where:{payment:{ none: {}}},include:{operadores:true,estoques:{include:{produto:true}},payment:true}})
   }
-
+  listOSAdm(){
+    return this.Prisma.serviceOrder.findMany({include:{operadores:true,estoques:{include:{produto:true}},payment:true}})
+  }
   findOne(id: number) {
     return this.Prisma.serviceOrder.findUnique({where:{id}})
   }

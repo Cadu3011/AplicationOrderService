@@ -14,11 +14,16 @@ export class OrdemServicoController {
     return this.ordemServicoService.create(createOrdemServicoDto,product)
   }
   @Post(':OSId/produtos/:produtoId')
-  async addProdutcOS(@Param('OSId' ,new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) ordemServiceId:number ,@Param('produtoId' ,new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) produtoId:number , @Body('quantidade',new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) quantidade:number) {
+  async addProdutcOS(@Param('OSId' ,new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) ordemServiceId:number ,
+  @Param('produtoId' ,new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) produtoId:number , 
+  @Body('quantidade',new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) quantidade:number) {
     console.log(ordemServiceId,produtoId,quantidade)
     return this.ordemServicoService.addProdutoOS(ordemServiceId,produtoId,quantidade)
   }
-
+  @Get('OSAdm')
+  findAllOSs(){
+    return this.ordemServicoService.listOSAdm()
+  }
   @Get()
   findAll() {
     return this.ordemServicoService.findAll();

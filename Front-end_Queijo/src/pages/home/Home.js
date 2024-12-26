@@ -10,7 +10,6 @@ const Home = () => {
   useEffect(() => {
     // Verifica se o token está presente no localStorage
     const access_token = localStorage.getItem('access_token');
-    console.log(access_token)
     if (access_token) {
       setIsLoggedIn(true);
       const decoded =jwtDecode (access_token)

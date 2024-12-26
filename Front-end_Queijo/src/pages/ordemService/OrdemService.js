@@ -6,7 +6,7 @@ import { jwtDecode  } from 'jwt-decode';
 
 const App = () => {
   const access_token = localStorage.getItem('access_token');
-  const decoded =jwtDecode (access_token)
+  const decoded = jwtDecode(access_token)
  
   const [ordens, setOrdens] = useState([]);
   const [search, setSearch] = useState("");
@@ -16,19 +16,21 @@ const App = () => {
   const [currentPage, setCurrentPage] = useState(1); 
   const [ordensPerPage] = useState(5); 
   const [isCreating, setIsCreating] = useState(false); 
-  const [newOrdem, setNewOrdem] = useState({ description: "", status: "PENDENTE",operadores:{
+  const [newOrdem, setNewOrdem] = useState({ description: "", status: "PENDENTE", operadores:{
     connect: [
       { id: decoded.sub }  // Conectando o operador com o ID extraído do token
     ]
   }});
-  const [isProductModalOpen, setIsProductModalOpen] = useState(false); // Estado para controle do modal de produto
-  const [productSearch, setProductSearch] = useState(""); // Busca de produto
-  const [products, setProducts] = useState([]); // Lista de produtos buscados
-  const [selectedProduct, setSelectedProduct] = useState(null); // Produto selecionado
-  const [quantity, setQuantity] = useState(1); // Quantidade do produto
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false); 
+  const [productSearch, setProductSearch] = useState(""); 
+  const [products, setProducts] = useState([]); 
+  const [selectedProduct, setSelectedProduct] = useState(null); 
+  const [quantity, setQuantity] = useState(1); 
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
- 
+  const [paymentValue, setPaymentValue] = useState(""); 
+  const [paymentMethod, setPaymentMethod] = useState(""); 
+  const [showPaymentForm, setShowPaymentForm] = useState(false); // Estado para controle do formulário de pagamento
+
   const fetchOrdens = async () => {
     try {
       const response = await axios.get("http://localhost:4000/ordem-servico");
@@ -40,12 +42,11 @@ const App = () => {
   
   useEffect(() => {
     fetchOrdens();
-   
   }, []);
+
   const handleProductSelect = (product) => {
-    setSelectedProduct(product); // Marca o produto como selecionado
+    setSelectedProduct(product); 
   };
-  
 
   const fetchProducts = async () => {
     try {
@@ -73,10 +74,6 @@ const App = () => {
       console.log("Selecione um produto válido e insira uma quantidade.");
     }
   };
-  
-  
-  
-  
 
   const openProductModal = () => {
     setIsProductModalOpen(true);
@@ -100,68 +97,86 @@ const App = () => {
     setIsCreating(true); // Para usar o mesmo layout de criação
   };
 
-  const handleLogout = () => {
-    navigate('/');
+  const handlePaymentChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "valor") {
+      setPaymentValue(value);
+    } else if (name === "modalidade") {
+      setPaymentMethod(value);
+    }
   };
-  
 
   const saveEdit = async () => {
+   
+      // Criar o objeto de pagamento
+      if(showPaymentForm === true){const paymentData = {
+        valor: Number(paymentValue),  // Garantir que o valor seja um número
+        modalidade: paymentMethod,
+        ordemId: editOrdem.id,
+      };
+  
+      try {
+        // Enviar o pagamento para a API
+        const response = await fetch("http://localhost:4000/payment", {
+          method: "POST", // Método de requisição
+          headers: {
+            "Content-Type": "application/json", // Enviar dados em formato JSON
+          },
+          body: JSON.stringify(paymentData), // Converte os dados para JSON
+        });
+  
+        // Verificar se a requisição foi bem-sucedida
+        if (response.ok) {
+          const result = await response.json(); // Opcional: pegar resposta da API
+          console.log("Pagamento salvo:", result);
+          setShowPaymentForm(false); // Fechar o formulário de pagamento
+        } else {
+          throw new Error("Erro ao salvar o pagamento");
+        }
+      } catch (error) {
+        console.error("Erro na requisição:", error);
+      }
+      }
     try {
       const operadoresExistentes = editOrdem.operadores || [];
       const produtosExistentes = editOrdem.estoques || []; // Produtos existentes (estoques)
   
-      // Adiciona o operador atual sem duplicar
       const operadoresAtualizados = [
-        ...operadoresExistentes.map(op => ({ id: op.id })),  // Converte os operadores existentes para apenas ids
-      { id: decoded.sub } // Só envia o ID do operador
+        ...operadoresExistentes.map(op => ({ id: op.id })), 
+        { id: decoded.sub } 
       ];
-  
-      // Verifique se todos os produtos são válidos e possuem ID
-      const produtosAtualizados = produtosExistentes.filter(estoque => estoque.id).map(estoque => ({ id: estoque.id }));
-  
-      // Se não houver produtos válidos, evite enviar a chave estoques
       const updateData = {
         status: editOrdem.status,
         description: editOrdem.description,
         operadores: {
-          connect: operadoresAtualizados, // Atualiza operadores (somente com ID)
+          connect: operadoresAtualizados, 
         },
       };
   
-      // Se houver produtos válidos, inclua no corpo da requisição
-      if (produtosAtualizados.length > 0) {
+      if (produtosExistentes.length > 0) {
+        const produtosAtualizados = produtosExistentes.filter(estoque => estoque.id).map(estoque => ({ id: estoque.id }));
         updateData.estoques = {
-          connect: produtosAtualizados, // Atualiza produtos
+          connect: produtosAtualizados, 
         };
       }
-  
-      console.log("Corpo da requisição enviado:", updateData); // Verifique o que está sendo enviado
-  
-      // Certifique-se de que o token JWT está sendo enviado corretamente
-      const access_token = localStorage.getItem('access_token');
+
       const config = {
         headers: {
           'Authorization': `Bearer ${access_token}`,
-          'Content-Type': 'application/json', // Adicionei o tipo de conteúdo como JSON
+          'Content-Type': 'application/json',
         }
       };
-  
-      // Envia a atualização para a API com o formato esperado
+
       const edit = await axios.patch(`http://localhost:4000/ordem-servico/${editOrdem.id}`, updateData, config);
   
       console.log("Ordem de serviço editada:", edit);
       setIsEditing(false);
       setIsCreating(false);
-      fetchOrdens(); // Atualiza a lista de ordens
+      fetchOrdens(); 
     } catch (error) {
       console.error("Erro ao salvar edição:", error);
     }
   };
-  
-  
-  
-  
-  
   
   const handleEditChange = (e) => {
     const { name, value } = e.target;
@@ -180,17 +195,24 @@ const App = () => {
   const createOrdem = async () => {
     try {
       const response = await axios.post("http://localhost:4000/ordem-servico", newOrdem);
-      const novaOrdem = response.data; // Supondo que o backend retorna a ordem criada
+      const novaOrdem = response.data;
       setNewOrdem({ description: "", status: "PENDENTE" });
-      setEditOrdem(novaOrdem); // Define a nova ordem como a ordem em edição
+      setEditOrdem(novaOrdem); 
       setIsCreating(false);
-      setIsEditing(true); // Abre a tela de edição para adicionar produtos
-      fetchOrdens(); // Atualiza a lista de ordens
+      setIsEditing(true); 
+      fetchOrdens(); 
     } catch (error) {
       console.error("Erro ao criar ordem:", error);
     }
   };
-  
+
+  const handlePaymentFormToggle = () => {
+    setShowPaymentForm(prevState => !prevState);
+  };
+
+  const handleLogout = () => {
+    navigate('/');
+  };
 
   return (
     <div className="container">
@@ -216,11 +238,22 @@ const App = () => {
           currentOrdens.map((ordem) => (
             <div className="ordem-item" key={ordem.id}>
               <div className="ordem-header">
+             
                 <h2>{ordem.description}</h2>
-                <span className={`status ${ordem.status}`}>{ordem.status}</span>
-                <button className="edit-btn" onClick={() => startEditing(ordem)}>
-                  Editar
-                </button>
+
+                <span className={`status ${ordem.status}`}>
+                  {ordem.status}
+                </span>
+                <div className="button-group">
+            <button className="edit-btn" onClick={() => startEditing(ordem)}>
+              Editar
+            </button>
+            {ordem.status === "CONFIRMED" && !showPaymentForm && (
+              <button className="edit-btn" onClick={handlePaymentFormToggle}>
+                FINALIZAR
+              </button>
+            )}
+          </div>
               </div>
               <div className="operadores">
                 <strong>Operadores:</strong>
@@ -271,24 +304,19 @@ const App = () => {
         <div className="product-modal-overlay">
           <div className="product-modal">
             <h3>Adicionar Produto</h3>
-            
-            {/* Campo de busca de produto */}
             <input
               type="text"
               placeholder="Buscar produto"
               value={productSearch}
-              onChange={(e) => setProductSearch(e.target.value)} // Atualiza a busca
+              onChange={(e) => setProductSearch(e.target.value)}
             />
-            
-            <button onClick={fetchProducts}>Buscar</button> {/* Aciona a busca */}
-            
-            {/* Exibe a lista de produtos */}
+            <button onClick={fetchProducts}>Buscar</button>
             {products.length > 0 && (
               <ul>
                 {products.map((product) => (
                   <li
                     key={product.id}
-                    onClick={() => handleProductSelect(product)} // Marca o produto como selecionado
+                    onClick={() => handleProductSelect(product)}
                     className={selectedProduct && selectedProduct.id === product.id ? 'selected' : ''}
                   >
                     {product.name}
@@ -296,8 +324,6 @@ const App = () => {
                 ))}
               </ul>
             )}
-            
-            {/* Caso não tenha produto selecionado */}
             {selectedProduct && (
               <div>
                 <p>Produto selecionado: {selectedProduct.name}</p>
@@ -311,7 +337,6 @@ const App = () => {
                 <button onClick={addProductToOrder}>Adicionar Produto à Ordem</button>
               </div>
             )}
-
             <button onClick={() => setIsProductModalOpen(false)}>Cancelar</button>
           </div>
         </div>
@@ -350,12 +375,43 @@ const App = () => {
               </button>
             </div>
             {isEditing && (
-  <button onClick={openProductModal}>Adicionar Produto</button>
-)}
-
+              <button onClick={openProductModal}>Adicionar Produto</button>
+            )}
           </div>
         </div>
       )}
+      {showPaymentForm && (
+                <div className="create-modal-overlay">
+                  <div className="create-modal">
+                  <label>Valor:</label>
+                  <input
+                    type="number"
+                    name="valor"
+                    value={paymentValue}
+                    onChange={handlePaymentChange}
+                    required
+                  />
+                  <label>Modalidade de Pagamento:</label>
+                  <select
+                    name="modalidade"
+                    value={paymentMethod}
+                    onChange={handlePaymentChange}
+                    required
+                  >
+                    <option value="">Selecione...</option>
+                    <option value="DINHEIRO">Dinheiro</option>
+                    <option value="CREDITO">Credito</option>
+                    <option value="PARCELADO">Parcelado</option>
+                    <option value="DEBITO">Debito</option>
+                    <option value="PIX">Pix</option>
+                  </select>
+                  <button onClick={saveEdit}>Salvar Pagamento</button>
+                  <button onClick={() => { setShowPaymentForm(false)}}>
+                Cancelar
+              </button>
+                </div>
+              </div>
+              )}
     </div>
   );
 };

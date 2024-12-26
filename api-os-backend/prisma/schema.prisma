@@ -18,6 +18,13 @@ enum Status {
   CONFIRMED
   CANCELED
 }
+enum Modality {
+  DINHEIRO
+  DEBITO
+  CREDITO
+  PARCELADO
+  PIX
+}
 
 model User {
   id           Int               @id @default(autoincrement())
@@ -37,6 +44,7 @@ model ServiceOrder {
   updatedAt     DateTime          @updatedAt
   estoques       Estoque[]    @relation("ordemServiceStock")// Relacionamento com tabela pivot ProdutoOrdemServico
   operadores    User[] @relation("operatorOrdemSerice")// Relacionamento com tabela pivot OperadorOrdemServico
+  payment Payment[] @relation("paymentOrdemService")
 }
 
 model Product {
@@ -60,6 +68,13 @@ model Estoque {
   ordemId Int?            
   produto        Product            @relation("ProdutoEstoque", fields: [produtoId], references: [id])
   ordensServico  ServiceOrder?     @relation("ordemServiceStock", fields: [ordemId], references: [id])
+}
+model Payment{
+  id Int @id @default(autoincrement())
+  valor Decimal @db.Decimal(9,2)
+  modalidade Modality
+  ordemId Int
+  ordemServico ServiceOrder @relation("paymentOrdemService",fields: [ordemId], references: [id])
 }
 
 

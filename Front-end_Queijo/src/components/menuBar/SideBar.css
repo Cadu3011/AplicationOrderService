@@ -1,0 +1,44 @@
+/* Definindo o estilo geral da sidebar */
+.sidebar {
+    height: 100vh; /* 100% da altura da tela */
+    width: 250px; /* Largura da barra lateral */
+    position: fixed; /* Fixando a barra na lateral */
+    top: 0;
+    left: 0;
+    background-color: #333; /* Cor de fundo */
+    color: white; /* Cor do texto */
+    padding-top: 20px; /* Espaçamento superior */
+    padding-left: 20px;
+  }
+  
+  /* Estilizando o título da sidebar */
+  .sidebar h2 {
+    color: #f4f4f4;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+  }
+  
+  /* Estilizando os links da barra lateral */
+  .sidebar ul {
+    list-style-type: none; /* Removendo o marcador padrão */
+    padding: 0;
+  }
+  
+  .sidebar ul li {
+    margin: 20px 0; /* Espaçamento entre os itens */
+  }
+  
+  .sidebar ul li a {
+    color: white;
+    text-decoration: none; /* Removendo o sublinhado */
+    font-size: 1.2rem;
+    display: block; /* Tornando os links blocos para maior área clicável */
+    padding: 8px;
+    transition: background-color 0.3s ease;
+  }
+  
+  /* Efeito ao passar o mouse sobre o link */
+  .sidebar ul li a:hover {
+    background-color: #575757;
+  }
+  
