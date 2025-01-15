@@ -21,17 +21,17 @@ const RoutesApp = () => {
       <BrowserRouter>
         <Fragment>
           <Routes>
-            {/* Página de login que não terá o MenuBar */}
+            
             <Route path="/" element={<Signin />} />
             <Route path="/ordemService" element={<OrdemService />} />
-            {/* As rotas abaixo serão renderizadas dentro do Layout, que contém o MenuBar */}
+            
             <Route element={<Layout />}>
               <Route path="/home" element={<Home />} />
               <Route path="/homeAdmin" element={<HomeAdmin />} />
               <Route path="/admin-user" element={<AdminUser />} />
               <Route path="/admin-os" element={<AdminOrderService />} />
               <Route path="/admin-estoque" element={<AdminEstoque />} />
-              
+
             </Route>
           </Routes>
         </Fragment>

@@ -133,7 +133,6 @@ const User = () => {
 
       <button className="btn-voltar" onClick={handleLogout}>Voltar</button>
 
-      {/* Modal de criação/edição */}
       {isModalOpen && (
         <div className="create-modal-overlay">
           <div className="create-modal">

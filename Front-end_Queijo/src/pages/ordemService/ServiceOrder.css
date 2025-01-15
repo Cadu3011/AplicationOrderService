@@ -35,7 +35,7 @@
   }
   .button-container {
     display: flex;
-    gap: 10px; /* Espaçamento entre os botões */
+    gap: 10px; 
   }
   .search-container input {
     width: 100%;

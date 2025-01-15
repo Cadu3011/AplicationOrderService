@@ -1,4 +1,4 @@
-/* Reset básico e fonte padrão */
+
 * {
   margin: 0;
   padding: 0;
@@ -6,7 +6,7 @@
 }
 
 body {
-  font-family: 'Roboto', sans-serif; /* Fonte mais moderna */
+  font-family: 'Roboto', sans-serif; 
   background-color: #f4f4f4;
   color: #333;
   display: flex;
@@ -15,20 +15,20 @@ body {
   height: 100vh;
 }
 
-/* Container principal da aplicação */
+
 .app-container {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centraliza todo o conteúdo */
+  align-items: center; 
   justify-content: center;
   height: 100vh;
   text-align: center;
   padding: 20px;
   width: 100%;
-  max-width: 1200px; /* Limita a largura */
+  max-width: 1200px; 
 }
 
-/* Cabeçalho da aplicação */
+
 h1 {
   font-size: 40px;
   color: #007bff;
@@ -37,7 +37,6 @@ h1 {
   font-weight: 700;
 }
 
-/* Botão de logout */
 button {
   background-color: #dc3545;
   color: white;
@@ -55,15 +54,15 @@ button:hover {
   background-color: #c82333;
 }
 
-/* Estilo para a barra de navegação */
+
 .navigation {
   display: flex;
-  justify-content: center; /* Centraliza os botões */
+  justify-content: center; 
   gap: 20px;
   margin-bottom: 30px;
 }
 
-/* Estilo para cada botão de navegação */
+
 .nav-button {
   background-color: #007bff;
   border: none;
@@ -72,17 +71,17 @@ button:hover {
   cursor: pointer;
   font-size: 18px;
   font-weight: 600;
-  transition: all 0.3s ease-in-out; /* Suaviza o hover */
+  transition: all 0.3s ease-in-out; 
   position: relative;
 }
 
 .nav-button:hover {
   background-color: #0056b3;
-  transform: translateY(-3px); /* Levanta o botão ao passar o mouse */
+  transform: translateY(-3px); 
 }
 
 .nav-button:active {
-  transform: translateY(1px); /* Efeito de pressionar */
+  transform: translateY(1px); 
 }
 
 .nav-link {
@@ -96,17 +95,17 @@ button:hover {
   color: #fff;
 }
 
-/* Sombras e animação de foco */
+
 .nav-button, button {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .nav-button:focus, button:focus {
   outline: none;
-  box-shadow: 0 0 8px 2px rgba(0, 123, 255, 0.5); /* Efeito de foco */
+  box-shadow: 0 0 8px 2px rgba(0, 123, 255, 0.5); 
 }
 
-/* Estilização do conteúdo das páginas */
+
 .page-content {
   max-width: 900px;
   margin: 20px;
@@ -116,7 +115,7 @@ button:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Pequenos ajustes de responsividade */
+
 @media (max-width: 768px) {
   .navigation {
     flex-direction: column;
