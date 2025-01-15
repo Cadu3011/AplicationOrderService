@@ -40,7 +40,7 @@ export class OrdemServicoController {
   @Patch(':id')
   update(
     @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number,
-    @Body() updateOrdemServicoDto: Prisma.ServiceOrderUpdateInput // Alterado de ServiceOrderCreateManyArgs para ServiceOrderUpdateInput
+    @Body() updateOrdemServicoDto: Prisma.ServiceOrderUpdateInput 
   ) {
     return this.ordemServicoService.update({ where: { id }, data: updateOrdemServicoDto });
   }

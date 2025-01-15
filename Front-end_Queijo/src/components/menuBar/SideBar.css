@@ -1,37 +1,42 @@
-
 .menu-container {
   position: relative;
-  font-family:  Arial, sans-serif;
- 
+  font-family: Arial, sans-serif;
 }
 
-
 .hamburger-button {
+  position: fixed;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
   background: #944343;
   color: white;
   border: none;
   padding: 10px 15px;
-  border-radius: 5px;
+  border-radius: 0 5px 5px 0;
   font-size: 18px;
   cursor: pointer;
   transition: background 0.3s ease, transform 0.2s ease;
-  
+  z-index: 1100;
+  width: 5%;
+  height: 100%;
 }
 
 .hamburger-button:hover {
   background: #704444;
-  transform: scale(1.05);
+  transform: translateY(-50%) scale(1.05);
 }
 
-
+.hamburger-button.hidden {
+  display: none;
+}
 .sidebar {
   position: fixed;
   top: 0;
-  left: -300px; 
+  left: -300px;
   width: 300px;
   height: 100%;
-  background: transparent;
-  color: white;
+  background: none;
+  color: transparent;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
   padding: 20px;
   display: flex;
@@ -42,53 +47,27 @@
   z-index: 1000;
 }
 
-.to-go-out {
-  background: transparent;
-  color: rgb(44, 44, 44);
-}
-
-
-
 .sidebar.open {
-  left: 0; 
+  left: 0;
 }
 
 .close-tab {
   background: none;
-  border: none; 
+  border: none;
   color: white;
   font-size: 24px;
   cursor: pointer;
   position: absolute;
   top: 15px;
   right: 15px;
-
+  width: 50px;
+  height: 50px;
+  padding: 0;
 }
 
 .close-tab:hover {
   transform: rotate(90deg);
-  background: none;
-  box-shadow: none;
-}
-
-
-.sidebar h2 {
-  margin: 0;
-  font-size: 24px;
-  font-weight: bold;
-  color: #ffffff;
-  border-bottom: 2px solid #444;
-  padding-bottom: 10px;
-}
-
-
-ul {
-  list-style: none;
-  padding: 5;
-  margin: 0;
-  width: 100%;
-  height: 50%;
- 
+  background-color: #3c4550;
 }
 
 .nav-link {
@@ -98,38 +77,26 @@ ul {
   padding: 10px 15px;
   border-radius: 5px;
   background: linear-gradient(135deg, #858888, #946d6d, #3c4550);
-  text-align: left;
+  color: black;
+  margin-bottom: 10px;
   transition: background 0.3s ease, transform 0.2s ease;
-
 }
 
 .nav-link:hover {
-  background: #0056b3;
+  background: #c97572;
   transform: scale(1.05);
 }
 
-
-button {
+.to-go-out {
   background: #724746;
   color: white;
   border: none;
   padding: 10px 15px;
   border-radius: 5px;
-  font-size: 16px;
   cursor: pointer;
   transition: background 0.3s ease, transform 0.2s ease;
 }
 
-button:hover {
+.to-go-out:hover {
   background: #c97572;
-  transform: scale(1.05);
-}
-
-.to-go-out
-.sidebar.open,
-.hamburger-button,
-.close-tab,
-.nav-link,
-button {
-  transition: all 0.3s ease;
 }

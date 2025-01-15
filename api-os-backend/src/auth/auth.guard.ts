@@ -23,16 +23,16 @@ export class AuthGuard implements CanActivate {
     ]);
 
     if (!requiredRoles) {
-      return true; // Se não houver roles necessárias, qualquer usuário pode acessar
+      return true; 
     }
 
-    // Verificar o payload do token JWT
+    
     const payload = this.jwtService.verify(authorization, { secret: process.env.SECRET_KEY });
     request['sub'] = payload; // Adiciona o payload à requisição
 
-    const userRole: Role = payload.roles || []; // Assumindo que o payload tem o campo `role`
+    const userRole: Role = payload.roles || []; 
     
-    // Verifica se o usuário tem um dos papéis requeridos
+    
     const hasRole = requiredRoles.includes(userRole);
 
     if (!hasRole) {

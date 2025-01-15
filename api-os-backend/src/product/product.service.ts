@@ -16,10 +16,10 @@ export class ProductService {
       data: {
         name: data.name,
         price: data.price,
-        quantity: Number(data.quantity), // A quantidade do produto na tabela Product
+        quantity: Number(data.quantity),
         estoques: {
           create: 
-             estoqueData  // Quantidade do estoque
+             estoqueData  
           
         },
       },
@@ -28,31 +28,30 @@ export class ProductService {
     return product;
   }
   async addStockToProduct(productId: number, quantityToAdd: number): Promise<void> {
-    // Obter o produto e seu estoque
+   
     const product = await this.Prisma.product.findUnique({
       where: { id: productId },
-      include: { estoques: true }, // Incluindo a relação de estoque
+      include: { estoques: true }, 
     });
 
     if (!product) {
       throw new Error('Produto não encontrado');
     }
 
-    // Atualizar a quantidade do produto no estoque
     await this.Prisma.product.update({
       where: { id: productId },
       data: {
-        quantity: product.quantity + quantityToAdd, // Somar a quantidade ao estoque do produto
+        quantity: product.quantity + quantityToAdd,
       },
     });
 
-    // Atualizar o estoque (se necessário)
+    
     
       await this.Prisma.estoque.create({
         data: {
           quantidade: quantityToAdd,
           produto: {
-            connect: { id: productId }, // Somar a quantidade no estoque
+            connect: { id: productId }, 
         },
       }
       })

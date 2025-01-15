@@ -36,13 +36,12 @@ export class ProductController {
     try {
       const product = await this.productService.findAllProductOS(nome);
       if (!product) {
-        // Handle case where product might not be found
         return {
           message: 'Product not found',
-          data: [], // Return empty array if product not found
+          data: [], 
         };
       }
-      return  product // Wrap the retrieved product in an array
+      return  product 
       ;
     } catch (error) {
       throw('An error occurred');

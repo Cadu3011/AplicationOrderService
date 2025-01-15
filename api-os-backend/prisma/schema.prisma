@@ -42,8 +42,8 @@ model ServiceOrder {
   status        Status
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
-  estoques       Estoque[]    @relation("ordemServiceStock")// Relacionamento com tabela pivot ProdutoOrdemServico
-  operadores    User[] @relation("operatorOrdemSerice")// Relacionamento com tabela pivot OperadorOrdemServico
+  estoques       Estoque[]    @relation("ordemServiceStock")
+  operadores    User[] @relation("operatorOrdemSerice")
   payment Payment[] @relation("paymentOrdemService")
 }
 
@@ -55,8 +55,7 @@ model Product {
   isActive Boolean @default(true)
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
-  estoques       Estoque[]    @relation("ProdutoEstoque")       // Apenas especificando a relação sem os atributos
-   // Relacionamento com tabela pivot ProdutoOrdemServico
+  estoques       Estoque[]    @relation("ProdutoEstoque")       
 }
 
 model Estoque {

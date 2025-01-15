@@ -9,21 +9,21 @@ export class OrdemServicoService {
     const serviceOrder = await this.Prisma.serviceOrder.create({
       data: {
         ...data,
-        estoques: produto ? { create: [produto] } : undefined // Criando estoque se produto for fornecido
+        estoques: produto ? { create: [produto] } : undefined 
       }
     });
     return serviceOrder;
   }
 
   async addProdutoOS(ordemServicoId: number, productId: number, quantity: number): Promise<void> {
-    // Obter o produto
+    
     const product = await this.Prisma.product.findUnique({
       where: { id: productId, isActive: true },
     });
     
     const ordemService = await this.Prisma.serviceOrder.findUnique({
       where: { id: ordemServicoId },
-      include: { estoques: true } // Inclui os produtos já associados à ordem
+      include: { estoques: true } 
     });
   
     if (!product) {
@@ -34,15 +34,13 @@ export class OrdemServicoService {
       throw new Error('Ordem de serviço não encontrada');
     }
   
-    // Atualizar a quantidade do produto no estoque
     await this.Prisma.product.update({
       where: { id: productId },
       data: {
-        quantity: product.quantity - quantity, // Atualiza a quantidade do estoque do produto
+        quantity: product.quantity - quantity, 
       },
     });
   
-    // Adicionar o produto à ordem de serviço
     await this.Prisma.estoque.create({
       data: {
         quantidade: quantity,
@@ -70,14 +68,12 @@ export class OrdemServicoService {
   async update(params: { where: Prisma.ServiceOrderWhereUniqueInput, data: Prisma.ServiceOrderUpdateInput }) {
     const { where, data } = params;
     
-    // Verificando se a ordem de serviço existe
     const ordemService = await this.Prisma.serviceOrder.findUnique({ where });
   
     if (!ordemService) {
       throw new Error('Ordem de serviço não encontrada');
     }
   
-    // Verificando se operadores ou produtos precisam ser conectados
     const operadoresAtualizados = data.operadores ? {
       connect: data.operadores.connect || []
     } : undefined;
